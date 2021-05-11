@@ -10,6 +10,11 @@ public class SceneHandler : MonoBehaviour
         SceneManager.LoadScene("MainMenu");
     }
 
+    public void GoSettings()
+    {
+        SceneManager.LoadScene("Settings");
+    }
+
     public void GoLevelSelector()
     {
         SceneManager.LoadScene("LevelSelector");

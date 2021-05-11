@@ -13,4 +13,10 @@ public static class Constants
     public const string SCORE_POWERUP = "Score_PowerUp";
     public const string SCORE_ONCEAGAIN = "Score_OnceAgain";
     public const string SCORE_OURMUSIC = "Score_OurMusic";
+
+    #region Settings
+
+    public const string SETTINGS_REVERSECONTROLS = "Settings_ReverseControls";
+
+    #endregion
 }
