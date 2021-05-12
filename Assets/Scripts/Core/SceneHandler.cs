@@ -5,6 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class SceneHandler : MonoBehaviour
 {
+    public Animator LogoTransition;
+    public float LogoTransitionTime = 1f;
+
     public void GoMainMenu()
     {
         SceneManager.LoadScene("MainMenu");
@@ -22,19 +25,26 @@ public class SceneHandler : MonoBehaviour
 
     public void PlayPowerUp()
     {
-        PlayerPrefs.SetString(Constants.SELECTED_LEVEL, Constants.LEVEL_POWERUP);
-        SceneManager.LoadScene("Game");
+        StartCoroutine(LoadLevel(Constants.LEVEL_POWERUP, "Game"));
     }
 
     public void PlayOnceAgain()
     {
-        PlayerPrefs.SetString(Constants.SELECTED_LEVEL, Constants.LEVEL_ONCEAGAIN);
-        SceneManager.LoadScene("Game_OnceAgain");
+        StartCoroutine(LoadLevel(Constants.LEVEL_ONCEAGAIN, "Game_OnceAgain"));
     }
 
     public void PlayOurMusic()
     {
-        PlayerPrefs.SetString(Constants.SELECTED_LEVEL, Constants.LEVEL_OURMUSIC);
-        SceneManager.LoadScene("MainMenu");
+        StartCoroutine(LoadLevel(Constants.LEVEL_OURMUSIC, "MainMenu"));
+    }
+
+    private IEnumerator LoadLevel(string levelName, string levelScene)
+    {
+        LogoTransition.SetTrigger("Start");
+
+        yield return new WaitForSeconds(LogoTransitionTime);
+
+        PlayerPrefs.SetString(Constants.SELECTED_LEVEL, levelName);
+        SceneManager.LoadScene(levelScene);
     }
 }
