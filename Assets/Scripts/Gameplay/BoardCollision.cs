@@ -26,11 +26,11 @@ public class BoardCollision : MonoBehaviour
                 break;
         }
 
-        //DestructionClip.Play();
+        DestructionClip.Play();
         var particles = Instantiate(currentExplosionParticles, collision.contactCount > 0 ? collision.contacts[0].point : Vector2.zero, Quaternion.identity);
         particles.GetComponent<ParticleSystem>().Play();
         Destroy(collision.gameObject.transform.parent.gameObject);
         Destroy(particles, 5f);
-        //GameController.current.BallMissed();
+        GameController.current.BallMissed();
     }
 }

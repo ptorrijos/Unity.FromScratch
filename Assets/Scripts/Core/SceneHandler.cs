@@ -23,6 +23,11 @@ public class SceneHandler : MonoBehaviour
         SceneManager.LoadScene("LevelSelector");
     }
 
+    public void GoCustomization()
+    {
+        SceneManager.LoadScene("Customization");
+    }
+
     public void PlayPowerUp()
     {
         StartCoroutine(LoadLevel(Constants.LEVEL_POWERUP, "Game"));
