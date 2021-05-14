@@ -738,6 +738,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotateSpeed: 1
+  Board: {fileID: 647338556}
 --- !u!212 &647338559
 SpriteRenderer:
   m_ObjectHideFlags: 0
