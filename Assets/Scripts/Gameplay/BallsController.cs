@@ -16,7 +16,7 @@ public class BeatSettings
     }
 }
 
-public class BallsController : AudioSyncer
+public class BallsController : MonoBehaviour
 {
     public GameObject[] Balls;
     public float Distance = 20f;
@@ -24,34 +24,15 @@ public class BallsController : AudioSyncer
 
     private float _last;
     private int _lastDirection;
-    private float _time;
-    private string BEATS;
-    private string SPECTRUM;
-    private string[] FREQUENCIES;
     private List<BeatSettings> _songSettings;
     private List<BeatSettings> _songSettings_PowerUp;
     private List<BeatSettings> _songSettings_OnceAgain;
     private List<BeatSettings> _songSettings_OurMusic;
-    private float[] _audioSpectrum;
-    private float[] _samples;
-    public float[] _freqBand;
-    public float _freqAcum;
-    private List<float> _audioOutputSpectrum;
-    private List<float[]> _audioOutputFreqs;
 
     void Start()
     {
         _last = 0;
         _lastDirection = 1;
-        _time = Time.time;
-        BEATS = "";
-        SPECTRUM = "";
-        FREQUENCIES = new string[8];
-        _audioSpectrum = new float[128];
-        _samples = new float[512];
-        _freqBand = new float[8];
-        _audioOutputSpectrum = new List<float>();
-        _audioOutputFreqs = new List<float[]>();
         SetupSongSettings();
 
         switch (PlayerPrefs.GetString(Constants.SELECTED_LEVEL))
@@ -68,119 +49,16 @@ public class BallsController : AudioSyncer
         }
     }
 
-    private void GetSpectrumAudioSource()
+    private void Update()
     {
-        Audio.GetSpectrumData(_samples, 0, FFTWindow.Blackman);
-    }
-
-    public void MakeFrequencyBands()
-    {
-        int count = 0;
-        float average = 0;
-
-        for (int i = 0; i < 8; i++)
+        if (Audio.isPlaying && PlayerPrefs.GetInt(Constants.GAME_PAUSE) == 0)
         {
-            average = 0;
-            int sampleCount = (int)Mathf.Pow(2, i) * 2;
-
-            if (i == 7)
-            {
-                sampleCount += 2;
-            }
-            for(int j = 0; j < sampleCount; j++)
-            {
-                average += _samples[count] * (count + 1);
-                count++;
-            }
-
-            average /= count;
-
-            _freqBand[i] = average * 10;
-        }
-
-        count = 0;
-        _freqAcum = 0;
-        average = 0;
-
-        for (int i = 0; i < 8; i++)
-        {
-            average += _freqBand[i] * (i + 1);
-            count++;
-        }
-        average /= count;
-        _freqAcum = average * 10;
-    }
-
-    public override void OnUpdate()
-    {
-        if (Audio.isPlaying)
-        {
-            GetSpectrumAudioSource();
-            MakeFrequencyBands();
-
-            AudioListener.GetSpectrumData(_audioSpectrum, 0, FFTWindow.Hamming);
-
-            if (_audioSpectrum != null && _audioSpectrum.Length > 0)
-            {
-                var beatInstant = (int)(Audio.time * 10);
-
-                if (beatInstant >= _audioOutputSpectrum.Count)
-                {
-                    _audioOutputSpectrum.Add(_freqAcum);
-                    _audioOutputFreqs.Add(new float[8]);
-                }
-                else
-                {
-                    _audioOutputSpectrum[beatInstant] = Mathf.Max(_freqAcum, _audioOutputSpectrum[beatInstant]);
-                }
-
-                for (int i = 0; i < 8; i++)
-                {
-                    _audioOutputFreqs[beatInstant][i] = Mathf.Max(_freqBand[i], _audioOutputFreqs[beatInstant][i]);
-                }
-            }
-
-            base.OnUpdate();
-
             if (_songSettings[(int)(Audio.time * 10)].DoBeat != null)
             {
                 _songSettings[(int)(Audio.time * 10)].DoBeat = null;
                 InstanciateBall(_songSettings[(int)(Audio.time * 10)]);
             }
-
-            if (isBeat) return;
         }
-
-        if (!Audio.isPlaying && _audioOutputSpectrum.Count > 1)
-        {
-            SPECTRUM = "";
-            for (int i = 0; i < _audioOutputSpectrum.Count; i++)
-            {
-                SPECTRUM += _audioOutputSpectrum[i].ToString() + ";";
-                FREQUENCIES[0] += _audioOutputFreqs[i][0].ToString() + ";";
-                FREQUENCIES[1] += _audioOutputFreqs[i][1].ToString() + ";";
-                FREQUENCIES[2] += _audioOutputFreqs[i][2].ToString() + ";";
-                FREQUENCIES[3] += _audioOutputFreqs[i][3].ToString() + ";";
-                FREQUENCIES[4] += _audioOutputFreqs[i][4].ToString() + ";";
-                FREQUENCIES[5] += _audioOutputFreqs[i][5].ToString() + ";";
-                FREQUENCIES[6] += _audioOutputFreqs[i][6].ToString() + ";";
-                FREQUENCIES[7] += _audioOutputFreqs[i][7].ToString() + ";";
-            }
-        }
-    }
-
-    public override void OnBeat()
-    {
-        var beatInstant = (int)(Audio.time * 10);
-        BEATS += beatInstant.ToString() + ";";
-        SPECTRUM += _audioOutputSpectrum[beatInstant].ToString() + ";";
-        //Debug.Log(SPECTRUM);
-
-        base.OnBeat();
-
-        ////StopCoroutine("MoveToScale");
-        //StartCoroutine("MoveToScale", beatScale);
-        //InstanciateBall();
     }
 
     private void InstanciateBall(BeatSettings beatSettings)
@@ -191,7 +69,6 @@ public class BallsController : AudioSyncer
         var randomAngle = _last + (60f * _lastDirection * (beatSettings.Distance ?? 0));
         var randomAngleRad = randomAngle * Mathf.PI / 180;
         _last = randomAngle;
-        _time += Random.Range(0.5f, 1.5f);
 
         var ball = Instantiate(Balls[ballObject], new Vector3(Mathf.Cos(randomAngleRad) * Distance, Mathf.Sin(randomAngleRad) * Distance), Quaternion.identity);
     }

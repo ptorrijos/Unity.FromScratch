@@ -7,6 +7,7 @@ public static class Constants
     #region General
 
     public const string SCORE_PLAYER = "Score_Total";
+    public const string GAME_PAUSE = "Game_Paused";
 
     #endregion
 

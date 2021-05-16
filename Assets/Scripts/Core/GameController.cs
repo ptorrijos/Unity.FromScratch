@@ -12,28 +12,43 @@ public class GameController : MonoBehaviour
     public int MissedBalls = 0;
     public Text ScoreDisplay;
     public Text LivesDisplay;
-    public AudioSource Audio;
     public string ScoreMusicKey;
 
     public static GameController current;
 
-    // Start is called before the first frame update
+    private AudioSource _music;
+
     void Start()
     {
+        PlayerPrefs.SetInt(Constants.GAME_PAUSE, 0);
         current = this;
         Score = 0;
         MissedBalls = 0;
         Lives = 100;
+
+        _music = GetComponent<AudioSource>();
+
     }
 
     private void Update()
     {
+        bool pausedGame = PlayerPrefs.GetInt(Constants.GAME_PAUSE) == 1;
+
+        if (pausedGame && _music.isPlaying)
+        {
+            _music.Pause();
+        }
+        if (!pausedGame && !_music.isPlaying)
+        {
+            _music.UnPause();
+        }
+
         ScoreDisplay.text = "SCORE: " + Score.ToString();
         LivesDisplay.text = "LIVES: " + Lives.ToString();
 
-        if (!Audio.isPlaying)
+        if (_music.time >= _music.clip.length)
         {
-            FinishGame();
+            Invoke("FinishGame", 1f);
         }
     }
 
