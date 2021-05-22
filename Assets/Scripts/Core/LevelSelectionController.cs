@@ -15,9 +15,4 @@ public class LevelSelectionController : MonoBehaviour
         OnceAgainScore.text = "SCORE: " + PlayerPrefs.GetInt(Constants.SCORE_ONCEAGAIN).ToString();
         OurMusicScore.text = "SCORE: " + PlayerPrefs.GetInt(Constants.SCORE_OURMUSIC).ToString();
     }
-
-    void Update()
-    {
-        
-    }
 }
